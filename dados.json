@@ -36,7 +36,7 @@
     {
       "id": 5,
       "nome": "tiago",
-      "senha": "123",
+      "senha": "1234",
       "acertos": []
     },
     {
@@ -51,7 +51,11 @@
       "senha": "123",
       "acertos": [
         2,
-        3
+        3,
+        1
+      ],
+      "categorias": [
+        "portugues"
       ]
     },
     {
@@ -65,17 +69,32 @@
       "nome": "tiagob",
       "senha": "123",
       "acertos": []
+    },
+    {
+      "id": 10,
+      "nome": "tiagobr",
+      "senha": "1234",
+      "acertos": [
+        4
+      ],
+      "categorias": [
+        "todas"
+      ]
     }
   ],
   "questoes": {
     "matematica": [
       [
-        "Quanto \u00e9 2 + 2 ?",
+        "Quanto \u00e9 3 + 1 ?",
         "4"
       ],
       [
         "Quanto \u00e9 5-1 ?",
         "4"
+      ],
+      [
+        "Quanto \u00e9 10 / 2 ?",
+        "5"
       ]
     ],
     "portugues": [

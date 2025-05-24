@@ -18,20 +18,11 @@ def salva_dados(d):
 def cadastro():
     d = carrega_dados()
     nome = input("Nome: ")
-    senha = getpass.getpass("Senha: ")
-    novo = {"id": len(d["usuarios"]) + 1, "nome": nome, "senha": senha, "acertos": []}
-    d["usuarios"].append(novo)
-    salva_dados(d)
-    print("✅ Usuário cadastrado!")
-
-def cadastro():
-    d = carrega_dados()
-    nome = input("Nome: ")
     if any(u["nome"] == nome for u in d["usuarios"]):
         print("❌ Nome de usuário já cadastrado. Tente outro.")
         return
     senha = getpass.getpass("Senha: ")
-    novo = {"id": len(d["usuarios"]) + 1, "nome": nome, "senha": senha, "acertos": []}
+    novo = {"id": len(d["usuarios"]) + 1, "nome": nome, "senha": senha, "acertos": [], "categorias": []}
     d["usuarios"].append(novo)
     salva_dados(d)
     print("✅ Usuário cadastrado!")
@@ -119,6 +110,29 @@ def editar_questao():
     except:
         print("❌ Erro ao tentar editar questão.")
 
+def ranking():
+    d = carrega_dados()
+    print("\n🏆 Ranking de Usuários por Pontuação Total:")
+    ranking = [(u["nome"], sum(u["acertos"])) for u in d["usuarios"]]
+    ranking.sort(key=lambda x: x[1], reverse=True)
+    for i, (nome, pontos) in enumerate(ranking, 1):
+        print(f"{i}. {nome} - {pontos} pontos")
+
+def estatisticas():
+    d = carrega_dados()
+    todas = [a for u in d["usuarios"] for a in u["acertos"] if a > 0]
+    if not todas:
+        print("\n📊 Nenhuma estatística disponível ainda.")
+        return
+    media = sum(todas) / len(todas)
+    maxima = max(todas)
+    minima = min(todas)
+    print("\n📈 Estatísticas Gerais:")
+    print(f"- Tentativas registradas: {len(todas)}")
+    print(f"- Média de acertos: {media:.2f}")
+    print(f"- Maior pontuação: {maxima}")
+    print(f"- Menor pontuação: {minima}")
+
 def listar_usuarios():
     d = carrega_dados()
     print("\n📋 Lista de usuários cadastrados:")
@@ -155,21 +169,6 @@ def exibir_questoes():
         for i, (pergunta, resposta) in enumerate(perguntas, 1):
             print(f"{i}. {pergunta} -> Resposta: {resposta}")
 
-def estatisticas():
-    d = carrega_dados()
-    todas = [a for u in d["usuarios"] for a in u["acertos"] if a > 0]
-    if not todas:
-        print("\n📊 Nenhuma estatística disponível ainda.")
-        return
-    media = sum(todas) / len(todas)
-    maxima = max(todas)
-    minima = min(todas)
-    print("\n📈 Estatísticas Gerais:")
-    print(f"- Tentativas registradas: {len(todas)}")
-    print(f"- Média de acertos: {media:.2f}")
-    print(f"- Maior pontuação: {maxima}")
-    print(f"- Menor pontuação: {minima}")
-
 def quiz(user):
     d = carrega_dados()
     u = next(u for u in d["usuarios"] if u["id"] == user["id"])
@@ -177,58 +176,36 @@ def quiz(user):
     if not categorias:
         print("Sem categorias disponíveis. Aguarde o administrador adicionar questões.")
         return
+
     print("\nCategorias disponíveis:")
     for i, cat in enumerate(categorias, 1):
         print(f"{i}. {cat}")
     print(f"{len(categorias)+1}. Todas misturadas")
+
     try:
         op = int(input("\nEscolha a categoria (digite o número): "))
         if op == len(categorias)+1:
             perguntas = [q for lista in d["questoes"].values() for q in lista]
+            categoria_escolhida = "todas"
         else:
-            perguntas = d["questoes"][categorias[op-1]]
+            categoria_escolhida = categorias[op-1]
+            perguntas = d["questoes"][categoria_escolhida]
     except:
         print("Opção inválida.")
         return
+
     if not perguntas:
         print("Sem perguntas nessa categoria.")
         return
+
     random.shuffle(perguntas)
     acertos = sum(1 for q,a in perguntas if input(q+" ") == a)
     u["acertos"].append(acertos)
+    if "categorias" not in u:
+        u["categorias"] = []
+    u["categorias"].append(categoria_escolhida)
     salva_dados(d)
     print(f"🎯 Acertou {acertos}/{len(perguntas)}")
-
-def ranking_por_categoria():
-    d = carrega_dados()
-    if not d["questoes"]:
-        print("\n❌ Nenhuma categoria com questões cadastradas.")
-        return
-    for categoria in d["questoes"]:
-        print(f"\n🏆 Ranking - Categoria: {categoria}")
-        pontuacoes = []
-        for u in d["usuarios"]:
-            total = 0
-            for quiz, perguntas in zip(u.get("categorias", []), u["acertos"]):
-                if quiz == categoria:
-                    total += perguntas
-            if total:
-                pontuacoes.append((u["nome"], total))
-        if not pontuacoes:
-            print("Nenhum usuário respondeu essa categoria.")
-            continue
-        pontuacoes.sort(key=lambda x: x[1], reverse=True)
-        for i, (nome, pontos) in enumerate(pontuacoes, 1):
-            print(f"{i}. {nome} - {pontos} pontos")
-
-
-def ranking():
-    d = carrega_dados()
-    print("\n🏆 Ranking de Usuários por Pontuação Total:")
-    ranking = [(u["nome"], sum(u["acertos"])) for u in d["usuarios"]]
-    ranking.sort(key=lambda x: x[1], reverse=True)
-    for i, (nome, pontos) in enumerate(ranking, 1):
-        print(f"{i}. {nome} - {pontos} pontos")
 
 def menu():
     user = None
@@ -240,7 +217,25 @@ def menu():
             elif op == "2": user = login()
             elif op == "3": break
             else: print("Opção inválida.")
-        elif user.get("admin"):
+        elif not user.get("admin"):
+            print(f"\nUsuário: {user['nome']} (ID: {user['id']})")
+            print("1. Fazer Quiz")
+            print("2. Ver Ranking")
+            print("3. Alterar Senha")
+            print("4. Deletar Conta")
+            print("5. Logout")
+            print("6. Sair")
+            op = input(">> ")
+            if op == "1": quiz(user)
+            elif op == "2": ranking()
+            elif op == "3": alterar_senha(user)
+            elif op == "4":
+                if deletar_conta(user):
+                    user = None
+            elif op == "5": user = None
+            elif op == "6": break
+            else: print("Opção inválida.")
+        else:
             print("\nADMINISTRADOR")
             print("1. Adicionar Questão")
             print("2. Editar Questão")
@@ -261,24 +256,6 @@ def menu():
             elif op == "7": exibir_questoes()
             elif op == "8": user = None
             elif op == "9": break
-            else: print("Opção inválida.")
-        else:
-            print(f"\nUsuário: {user['nome']} (ID: {user['id']})")
-            print("1. Fazer Quiz")
-            print("2. Ver Ranking")
-            print("3. Alterar Senha")
-            print("4. Deletar Conta")
-            print("5. Logout")
-            print("6. Sair")
-            op = input(">> ")
-            if op == "1": quiz(user)
-            elif op == "2": ranking()
-            elif op == "3": alterar_senha(user)
-            elif op == "4":
-                if deletar_conta(user):
-                    user = None
-            elif op == "5": user = None
-            elif op == "6": break
             else: print("Opção inválida.")
 
 if __name__ == "__main__":
