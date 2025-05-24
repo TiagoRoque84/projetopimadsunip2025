@@ -1,0 +1,88 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "Ana",
+      "acertos": [
+        3,
+        4,
+        5,
+        2,
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Carlos",
+      "acertos": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": 3,
+      "nome": "Tiago",
+      "acertos": []
+    },
+    {
+      "id": 6,
+      "nome": "tiago2",
+      "senha": "12345",
+      "acertos": [
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "nome": "tiago",
+      "senha": "123",
+      "acertos": []
+    },
+    {
+      "id": 6,
+      "nome": "tiago",
+      "senha": "123",
+      "acertos": []
+    },
+    {
+      "id": 7,
+      "nome": "roque",
+      "senha": "123",
+      "acertos": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": 8,
+      "nome": "roque",
+      "senha": "123",
+      "acertos": []
+    },
+    {
+      "id": 9,
+      "nome": "tiagob",
+      "senha": "123",
+      "acertos": []
+    }
+  ],
+  "questoes": {
+    "matematica": [
+      [
+        "Quanto \u00e9 2 + 2 ?",
+        "4"
+      ],
+      [
+        "Quanto \u00e9 5-1 ?",
+        "4"
+      ]
+    ],
+    "portugues": [
+      [
+        "Qual \u00e9 o plural de \"p\u00e3o\"?",
+        "p\u00e3es"
+      ]
+    ]
+  }
+}
